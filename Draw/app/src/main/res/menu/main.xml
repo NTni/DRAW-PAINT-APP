@@ -3,6 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/normal"
+        app:showAsAction="never"
+        android:title="BASIC STROKE"/>
+
+    <item
+        android:id="@+id/blur"
+        app:showAsAction="never"
+        android:title="BLUR STROKE"/>
+
+    <item
+        android:id="@+id/emboss"
+        app:showAsAction="never"
+        android:title="EMBOSS STROKE"/>
+
+    <item
+        android:id="@+id/erase"
+        app:showAsAction="never"
+        android:checkable="true"
+        android:checked="false"
+        android:title="ERASE"/>
+
+    <item
+        android:id="@+id/background"
+        app:showAsAction="always"
+        android:title="BACKGROUND" />
+
+    <item
         android:id="@+id/undo_button"
         app:showAsAction="never"
         android:title="UNDO" />

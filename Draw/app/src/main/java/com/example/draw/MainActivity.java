@@ -25,9 +25,12 @@ import yuku.ambilwarna.AmbilWarnaDialog;
 public class MainActivity extends AppCompatActivity
 {
     private PaintView paintView;
+    //private PaintView2 paintView;
     private int defaultColor;
     private int STORAGE_PERMISSION = 1;
     public Button colorButton;
+    public Button bgButton;
+    private int defaultBGcolor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -39,7 +42,7 @@ public class MainActivity extends AppCompatActivity
         paintView = findViewById(R.id.paintView);
         colorButton = findViewById(R.id.Change_Color_Button);
         colorButton.setBackgroundColor(getResources().getColor(R.color.colorChange));
-        
+
         DisplayMetrics displayMetrics = new DisplayMetrics();
 
         SeekBar seekBar = findViewById(R.id.seekBar);
@@ -57,6 +60,13 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v) {
                 openColourPicker();
                 //colorButton.setBackgroundColor(defaultColor);
+            }
+        });
+        colorButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(getApplicationContext(), "COLOR PALETTE!", Toast.LENGTH_LONG).show();
+                return true;
             }
         });
 
@@ -151,6 +161,25 @@ public class MainActivity extends AppCompatActivity
 
         switch (item.getItemId()) {
 
+            case R.id.normal:
+                paintView.normal();
+                return true;
+            case R.id.blur:
+                paintView.blur();
+                return true;
+            case R.id.emboss:
+                paintView.emboss();
+                return true;
+            case R.id.erase:
+                if(!item.isChecked())
+                    paintView.eraseon();
+                else
+                    paintView.eraseoff();
+                item.setChecked(!item.isChecked());
+                return true;
+            case R.id.background:
+                openColourPicker2();
+                return true;
             case R.id.clear_button:
                 paintView.clear();
                 return true;
@@ -196,6 +225,32 @@ public class MainActivity extends AppCompatActivity
                 colorButton.setBackgroundColor(defaultColor);
 
 
+            }
+
+        });
+
+        ambilWarnaDialog.show(); // add
+
+    }
+    private void openColourPicker2 () {
+
+        AmbilWarnaDialog ambilWarnaDialog = new AmbilWarnaDialog(this, defaultColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
+
+            @Override
+            public void onCancel(AmbilWarnaDialog dialog) {
+
+                Toast.makeText(MainActivity.this, "COLOR NOT CHANGED!", Toast.LENGTH_LONG).show();
+
+            }
+
+            @Override
+            public void onOk(AmbilWarnaDialog dialog, int color) {
+
+                defaultBGcolor = color;
+
+                paintView.setBackground(color);
+                colorButton.setOutlineSpotShadowColor(color);
+                colorButton.setShadowLayer(25,10,10,color);
             }
 
         });

@@ -8,7 +8,7 @@
 
     <com.example.draw.PaintView
         android:id="@+id/paintView"
-        android:layout_width="412dp"
+        android:layout_width="wrap_content"
         android:layout_height="680dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -16,8 +16,10 @@
 
     <Button
         android:id="@+id/Change_Color_Button"
-        android:layout_width="57dp"
-        android:layout_height="53dp"
+        android:background="@drawable/circle"
+        android:padding="10dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.95"

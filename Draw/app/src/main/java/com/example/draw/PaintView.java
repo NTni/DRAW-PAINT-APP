@@ -229,15 +229,21 @@ package com.example.draw;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.EmbossMaskFilter;
+import android.graphics.MaskFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.os.Environment;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.File;
@@ -263,8 +269,17 @@ public class PaintView extends View {
     private Canvas mCanvas;
     private Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 
+    private boolean emboss;
+    private boolean blur;
+
+    private MaskFilter mEmboss;
+    private MaskFilter mBlur;
+
     private ArrayList<Draw> paths = new ArrayList<>();
     private ArrayList<Draw> undo = new ArrayList<>();
+
+    private boolean flag  = false;
+    private int lastColor;
 
     public PaintView(Context context) {
 
@@ -282,9 +297,13 @@ public class PaintView extends View {
         mPaint.setColor(DEFAULT_COLOR);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPaint.setStrokeCap(Paint.Cap.ROUND);
+        mPaint.setStrokeCap(Paint.Cap.SQUARE);
+
         mPaint.setXfermode(null);
         mPaint.setAlpha(0xff);
+
+        mEmboss= new EmbossMaskFilter(new float[] {1,1,1}, .4f,6,3.5f);
+        mBlur = new BlurMaskFilter(10, BlurMaskFilter.Blur.NORMAL);
 
     }
 
@@ -298,7 +317,7 @@ public class PaintView extends View {
 
         currentColor = DEFAULT_COLOR;
         strokeWidth = BRUSH_SIZE;
-
+        lastColor = currentColor;
     }
 
     @Override
@@ -314,6 +333,11 @@ public class PaintView extends View {
             mPaint.setStrokeWidth(draw.strokeWidth);
             mPaint.setMaskFilter(null);
 
+            if(draw.emboss)
+                mPaint.setMaskFilter(mEmboss);
+            else if (draw.blur)
+                mPaint.setMaskFilter(mBlur);
+
             mCanvas.drawPath(draw.path, mPaint);
 
         }
@@ -327,7 +351,7 @@ public class PaintView extends View {
 
         mPath = new Path();
 
-        Draw draw = new Draw(currentColor, strokeWidth, mPath);
+        Draw draw = new Draw(currentColor, strokeWidth, mPath,emboss,blur);
         paths.add(draw);
 
         mPath.reset();
@@ -345,7 +369,7 @@ public class PaintView extends View {
 
         if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
 
-            mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+            mPath.quadTo(mX, mY, (x + mX)/2, (y + mY)/2);
 
             mX = x;
             mY = y;
@@ -389,7 +413,8 @@ public class PaintView extends View {
 
     public void clear () {
 
-        backgroundColor = DEFAULT_BG_COLOR;
+        //backgroundColor = DEFAULT_BG_COLOR;
+        //for only white background
 
         paths.clear();
         invalidate();
@@ -426,6 +451,43 @@ public class PaintView extends View {
 
     }
 
+    public void normal() {
+        emboss = false;
+        blur = false;
+    }
+
+    public void emboss() {
+        emboss=true;
+        blur=false;
+    }
+
+    public void blur() {
+        emboss=false;
+        blur=true;
+    }
+    public void eraseon()
+    {
+            currentColor = backgroundColor;
+            //mPaint.setXfermode(null);
+            //mPaint.setAlpha(0xFF);
+            //mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            Toast.makeText(getContext(),"ERASOR ON",Toast.LENGTH_LONG).show();
+    }
+    public void eraseoff()
+    {
+        currentColor = lastColor;
+        //mPaint.setXfermode(null);
+        //mPaint.setShader(null);
+        //mPaint.setMaskFilter(null);
+        Toast.makeText(getContext(),"ERASOR OFF",Toast.LENGTH_LONG).show();
+    }
+
+    public void setBackground(int color)
+    {
+        backgroundColor = color;
+        invalidate();
+    }
+
     public void setStrokeWidth (int width) {
 
         strokeWidth = width;
@@ -435,7 +497,7 @@ public class PaintView extends View {
     public void setColor (int color) {
 
         currentColor = color;
-
+        lastColor = currentColor;
     }
 
     @SuppressLint("WrongThread")
